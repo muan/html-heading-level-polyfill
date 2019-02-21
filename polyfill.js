@@ -1,15 +1,15 @@
+// Default level is 1
+// Each parent sectioning element adds an extra heading level
 function determineLevel(el) {
   let level = 1;
-  // Arguably the parentNode being null check can be removed as it will never be null when this and
-  // the function below are run on a document, as is the case.
-  //
-  // This is "sectioning content" and "sectioning roots"
   while (el.parentNode && (el = el.parentNode.closest("article,aside,nav,section,blockquote,details,dialog,fieldset,figure,td"))) {
     level += 1;
   }
   return level;
 }
 
+// - If inside of <hgroup>, remove sementics
+// - If is <hgroup> or to <h1>, assign new level according to sectioning parents
 function adjustHeading(heading) {
   let type = heading.localName,
       parent = heading.parentNode;
@@ -30,12 +30,14 @@ function adjustHeading(heading) {
   }
 }
 
+// Get all heading elements and apply new heading level if necessary
 function traverseAndAdjustHeadings(doc) {
   doc.querySelectorAll("hgroup,h1,h2,h3,h4,h5,h6").forEach(heading => {
     adjustHeading(heading);
   })
 }
 
+// Initialize and observe
 function initiateHeadingPolyfill(doc) {
   traverseAndAdjustHeadings(doc);
   (new MutationObserver(() => traverseAndAdjustHeadings(doc))).observe(doc, { childList: true, subtree: true });
